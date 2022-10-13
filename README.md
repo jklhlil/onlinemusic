@@ -1,6 +1,6 @@
 # onlinemusic
 
-### 这是一个使用 vue + vue-router + axios 做的移动端音频播放软件。
+#### 这是一个使用 vue + vue-router + axios + balbel + Element + Vant 做的移动端音频播放软件。
 
 > 本系统主要内容包括：
 > 1.	查询功能，方便用户快速查询某个音频资源。
