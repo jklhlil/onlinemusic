@@ -1,0 +1,87 @@
+#    toncat端口                   8089
+server:
+  port: 8089
+spring:
+  #  数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/online_music?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+
+#上传文件的位置，不要忘了最后的斜杠"/"。正确：/data/music/
+  uploadUrl: D:/onlinemusic/onlineUpload
+
+  servlet:
+    #设置tomcat文件上传大小限制
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  mvc:
+    format:
+      #后端接受
+      date: yyyy-MM-dd
+
+    pathmatch:
+      #   Swagger版本报错
+      matching-strategy: ant_path_matcher
+
+  jackson:
+    #后端传出
+    date-format: yyyy-MM-dd
+
+
+  #邮箱基本配置
+  mail:
+
+#    # QQ  配置smtp服务主机地址
+#    host: smtp.qq.com
+#    #发送者邮箱
+#    username: 3189840163@qq.com
+#    #配置密码,注意不是真正的密码，而是刚刚申请到的授权码
+#    password: emjjutkwrhcrdfba
+#    fromName: 在线音频
+#    #端口号465或587  587 587
+#    port: 587
+
+    # 网易  配置smtp服务主机地址
+    host: smtp.163.com
+    #发送者邮箱
+    username: m13237941651@163.com
+    #配置密码,注意不是真正的密码，而是刚刚申请到的授权码
+    password: APLIVYGBRUUXVRZF
+    fromName: 在线音频官网
+    #端口号465或587  25 25
+    port: 25
+
+    #默认的邮件编码为UTF-8
+    default-encoding: UTF-8
+    #其他参数
+    properties:
+      mail:
+        #配置SSL 加密工厂
+        smtp:
+          ssl:
+            #本地测试，先放开ssl
+            #没有ssl安全证书，不支持ssl请求
+            enable: false
+            required: false
+          #开启debug模式，这样邮件发送过程的日志会在控制台打印出来，方便排查错误
+        debug: true
+
+
+
+
+
+
+# 扫描xml  映射实体
+mybatis:
+  type-aliases-package: com.ecjtu.onlinemusic.entity
+  mapper-locations: mapper/*Mapper.xml
+  #  打印日志
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
+
+

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecjtu.onlinemusic.dao.ActivityDao">
+    <resultMap id="activityMap" type="Activity">
+        <id property="id" column="activity_id"></id>
+        <result property="adminId" column="admin_id"></result>
+        <result property="name" column="activity_name"></result>
+        <result property="content" column="activity_content"></result>
+        <result property="startTime" column="activity_startTime"></result>
+        <result property="deadLine" column="activity_deadLine"></result>
+        <result property="createTime" column="activity_createTime"></result>
+        <result property="pictureUrl" column="picture_url"></result>
+        <result property="score" column="activity_score"></result>
+    </resultMap>
+    
+    <delete id="deleteById" parameterType="Integer">
+        delete
+        from activity
+        where activity_id = #{aaa}
+    </delete>
+    <!--    自动设置主键useGeneratedKeys="true" keyProperty="id"。   数据库主键一定要设置自增！！！  -->
+    <!--    now()-->
+    <insert id="insert"   useGeneratedKeys="true"  keyProperty="id">
+        insert into activity(activity_id, admin_id, activity_name, activity_content, activity_starttime, activity_deadline,
+                             activity_createtime, picture_url, activity_score)
+        values (null , #{adminId}, #{name}, #{content}, #{startTime}, #{deadLine},now(), #{pictureUrl}, #{score})
+    </insert>
+    <!-- 数字和时间都不能跟字符串比较！！   -->
+    <update id="update" parameterType="Activity">
+        update activity
+        <set>
+            <if test="adminId != null">
+                admin_id = #{adminId},
+            </if>
+            <if test="name != null and name != ''">
+                activity_name = #{name},
+            </if>
+            <if test="content != null and content != ''">
+                activity_content = #{content},
+            </if>
+            <if test="startTime != null ">
+                activity_starttime = #{startTime},
+            </if>
+            <if test="deadLine != null">
+                activity_deadline = #{deadLine},
+            </if>
+            <if test="createTime != null ">
+                activity_createtime = #{createTime},
+            </if>
+            <if test="pictureUrl != null and pictureUrl != ''">
+                picture_url = #{pictureUrl},
+            </if>
+            <if test="score != null">
+                activity_score = #{score},
+            </if>
+        </set>
+        where activity_id = #{id,jdbcType=INTEGER}
+    </update>
+
+<!--  根据活动名模糊查询  -->
+    <select id="selectByPage" parameterType="Activity" resultMap="activityMap">
+        select *
+        from activity
+        <where>
+             activity_deadline > now()
+            <if test="activity != null">
+                <if test="activity.id != null">
+                    and activity_id = #{activity.id}
+                </if>
+                <if test="activity.adminId != null">
+                    and admin_id = #{activity.adminId}
+                </if>
+                <if test="activity.name != null and activity.name != ''">
+                    and activity_name like concat(concat('%',#{activity.name},'%'))
+                </if>
+                <if test="activity.content != null and activity.content != ''">
+                    and activity_content = #{activity.content}
+                </if>
+                <if test="activity.startTime != null">
+                    and activity_starttime = #{activity.startTime}
+                </if>
+                <if test="activity.deadLine != null">
+                    and activity_deadline = #{activity.deadLine}
+                </if>
+                <if test="activity.createTime != null ">
+                    and activity_createtime = #{activity.createTime}
+                </if>
+                <if test="activity.pictureUrl != null and activity.pictureUrl != ''">
+                    and picture_url = #{activity.pictureUrl}
+                </if>
+                <if test="activity.score != null">
+                    and activity_score = #{activity.score}
+                </if>
+            </if>
+        </where>
+        ORDER BY activity_createtime DESC
+        <if test="page!=null and page.startIndex !=null and page.pageSize!=null">
+            limit #{page.startIndex},#{page.pageSize}
+        </if>
+    </select>
+
+</mapper>

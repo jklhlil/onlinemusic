@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecjtu.onlinemusic.dao.MusicDao">
+    <!--    结构映射-->
+    <resultMap id="musicMap" type="Music">
+        <id property="id" column="music_id"></id>
+        <result property="adminId" column="admin_id"></result>
+        <result property="url" column="music_url"></result>
+        <result property="pictureUrl" column="music_picture_url"></result>
+        <result property="singer" column="singer"></result>
+        <result property="name" column="music_name"></result>
+        <result property="score" column="music_score"></result>
+        <result property="isCheck" column="music_is_check"></result>
+    </resultMap>
+
+    <delete id="deleteById" parameterType="Integer">
+        delete
+        from music
+        where music_id = #{aaa}
+    </delete>
+    <!--    自动设置主键useGeneratedKeys="true" keyProperty="id"。   数据库主键一定要设置自增！！！  -->
+    <insert id="insert"   useGeneratedKeys="true"  keyProperty="id">
+        insert into music(music_id, admin_id, music_url, music_picture_url, singer, music_name, music_score,
+                          music_is_check)
+        values (null, #{adminId}, #{url}, #{pictureUrl}, #{singer}, #{name}, #{score}, #{isCheck})
+    </insert>
+    <update id="update" parameterType="Music">
+        update music
+        <set>
+            <if test="adminId != null ">
+                admin_id = #{adminId},
+            </if>
+            <if test="url != null and url != ''">
+                music_url = #{url},
+            </if>
+            <if test="pictureUrl != null and pictureUrl != ''">
+                music_picture_url = #{pictureUrl},
+            </if>
+            <if test="singer != null and singer != ''">
+                singer = #{singer},
+            </if>
+            <if test="name != null and name != ''">
+                music_name = #{name},
+            </if>
+            <if test="score != null ">
+                music_score = #{score},
+            </if>
+            <if test="isCheck != null ">
+                music_is_check = #{isCheck},
+            </if>
+        </set>
+        where music_id = #{id,jdbcType=INTEGER}
+    </update>
+
+<!--    单表分页查询  -->
+<!--       模糊查询歌名-->
+<!--       模糊查询歌手-->
+    <select id="selectByPage" parameterType="Music" resultMap="musicMap">
+        select *
+        from music
+        <where>
+            <if test="music != null">
+                <if test="music.id != null ">
+                    and music_id = #{music.id}
+                </if>
+                <if test="music.adminId != null">
+                    and admin_id = #{music.adminId}
+                </if>
+                <if test="music.url != null and music.url != ''">
+                    and music_url = #{music.url}
+                </if>
+                <if test="music.pictureUrl != null and music.pictureUrl != ''">
+                    and music_picture_url = #{music.pictureUrl}
+                </if>
+
+                <if test="music.singer != null and music.singer != ''">
+                    and singer like concat(concat('%', #{music.singer, jdbcType=VARCHAR}),'%')
+                </if>
+
+                <if test="music.name != null and music.name != ''">
+                    and music_name like concat(concat('%', #{music.name, jdbcType=VARCHAR}),'%')
+                </if>
+
+                <if test="music.score != null ">
+                    and music_score = #{music.score}
+                </if>
+                <if test="music.isCheck != null">
+                    and music_is_check = #{music.isCheck}
+                </if>
+            </if>
+        </where>
+        <if test="page!=null and page.startIndex !=null and page.pageSize!=null">
+            limit #{page.startIndex},#{page.pageSize}
+        </if>
+    </select>
+    <select id="selectById" parameterType="Integer" resultMap="musicMap">
+        select *
+        from music
+        where music_id = #{id}
+    </select>
+</mapper>

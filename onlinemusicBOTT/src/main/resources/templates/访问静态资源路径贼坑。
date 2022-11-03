@@ -1,0 +1,9 @@
+1.templates里的资源只能通过控制器跳转访问。
+
+2.访问static里的资源，路径不要有static！！！
+    如：访问  resources/static/js/aa.js
+       应该写 src=/js/aa.js 或 src=js/aa.js
+
+3.如果control层想访问static资源，只需要在return加 redirect:
+    如：访问templstes文件夹下的a.html   return ”a.html“
+        访问static下的a.html          return ”redirect:a.html“

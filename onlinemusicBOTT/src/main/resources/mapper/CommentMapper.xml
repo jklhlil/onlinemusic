@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecjtu.onlinemusic.dao.CommentDao">
+    <!--    结构映射-->
+    <resultMap id="commentMap" type="Comment">
+        <id property="id" column="comment_id"></id>
+        <result property="adminId" column="admin_id"></result>
+        <result property="consumerId" column="consumer_id"></result>
+        <result property="musicId" column="music_id"></result>
+        <result property="content" column="comment_content"></result>
+        <result property="time" column="comment_time"></result>
+        <result property="isCheck" column="comment_is_check"></result>
+
+        <!--    映射 用户和音乐    -->
+        <association property="consumer" javaType="Consumer"
+                     resultMap="com.ecjtu.onlinemusic.dao.ConsumerDao.consumerMap"></association>
+        <association property="music" javaType="Music"
+                     resultMap="com.ecjtu.onlinemusic.dao.MusicDao.musicMap"></association>
+    </resultMap>
+
+    <delete id="deleteById" parameterType="Integer">
+        delete
+        from comment
+        where comment_id = #{aaa}
+    </delete>
+    <!--    自动设置主键useGeneratedKeys="true" keyProperty="id"。   数据库主键一定要设置自增！！！  -->
+    <!--    now() -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into comment(comment_id, admin_id, consumer_id, music_id, comment_content, comment_time,
+                            comment_is_check)
+        values (null, #{adminId}, #{consumerId}, #{musicId}, #{content}, now(), #{isCheck})
+    </insert>
+    <!-- 数字和时间都不能跟字符串比较！！   -->
+    <update id="update" parameterType="Comment">
+        update comment
+        <set>
+            <if test="adminId != null ">
+                admin_id = #{adminId},
+            </if>
+            <if test="consumerId != null ">
+                consumer_id = #{consumerId},
+            </if>
+            <if test="musicId != null ">
+                music_id = #{musicId},
+            </if>
+            <if test="content != null and content != ''">
+                comment_content = #{content},
+            </if>
+            <if test="time != null">
+                comment_time = #{time},
+            </if>
+            <if test="isCheck != null ">
+                comment_is_check = #{isCheck},
+            </if>
+        </set>
+        where comment_id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectByPage" parameterType="Comment" resultMap="commentMap">
+        select *
+        from comment com
+        <where>
+            com.consumer_id is not null
+            and com.music_id is not null
+            <if test="comment != null">
+                <if test="comment.id != null">
+                    and com.comment_id = #{comment.id}
+                </if>
+                <if test="comment.adminId != null">
+                    and com.admin_id = #{comment.adminId}
+                </if>
+                <if test="comment.consumerId != null ">
+                    and com.consumer_id = #{comment.consumerId}
+                </if>
+                <if test="comment.musicId != null">
+                    and com.music_id = #{comment.musicId}
+                </if>
+                <if test="comment.content != null and comment.content != ''">
+                    and com.comment_content like concat(concat('%',#{comment.content},'%'))
+                </if>
+                <if test="comment.time != null">
+                    and com.comment_time = #{comment.time}
+                </if>
+                <if test="comment.isCheck != null">
+                    and com.comment_is_check = #{comment.isCheck}
+                </if>
+            </if>
+        </where>
+        <if test="page!=null and page.startIndex !=null and page.pageSize!=null">
+            limit #{page.startIndex},#{page.pageSize}
+        </if>
+    </select>
+
+
+    <!-- 两表查询,能查到音乐  -->
+    <!-- 多表查询属性名前面要带表名-->
+    <select id="selectMusicByPage" parameterType="Comment" resultMap="commentMap">
+        select *
+        from comment com,music m
+        <where>
+            m.music_id=com.music_id
+            and com.consumer_id is not null
+            and com.music_id is not null
+            <if test="comment != null">
+                <if test="comment.id != null ">
+                    and com.comment_id = #{comment.id}
+                </if>
+                <if test="comment.adminId != null ">
+                    and com.admin_id = #{comment.adminId}
+                </if>
+                <if test="comment.consumerId != null ">
+                    and com.consumer_id = #{comment.consumerId}
+                </if>
+                <if test="comment.musicId != null ">
+                    and com.music_id = #{comment.musicId}
+                </if>
+                <if test="comment.content != null and comment.content != ''">
+                    and com.comment_content like concat(concat('%',#{comment.content},'%'))
+                </if>
+                <if test="comment.time != null">
+                    and com.comment_time = #{comment.time}
+                </if>
+                <if test="comment.isCheck != null">
+                    and com.comment_is_check = #{comment.isCheck}
+                </if>
+            </if>
+        </where>
+        ORDER BY com.comment_time DESC
+        <if test="page!=null and page.startIndex !=null and page.pageSize!=null">
+            limit #{page.startIndex},#{page.pageSize}
+        </if>
+
+    </select>
+
+    <!-- 两表查询,能查到用户  -->
+    <select id="selectConsumerByPage" parameterType="Comment" resultMap="commentMap">
+        select *
+        from comment com,consumer cons
+        <where>
+            com.consumer_id=cons.consumer_id
+            and com.consumer_id is not null
+            and com.music_id is not null
+            <if test="comment != null">
+                <if test="comment.id != null ">
+                    and com.comment_id = #{comment.id}
+                </if>
+                <if test="comment.adminId != null ">
+                    and com.admin_id = #{comment.adminId}
+                </if>
+                <if test="comment.consumerId != null ">
+                    and com.consumer_id = #{comment.consumerId}
+                </if>
+                <if test="comment.musicId != null ">
+                    and com.music_id = #{comment.musicId}
+                </if>
+                <if test="comment.content != null and comment.content != ''">
+                    and com.comment_content like concat(concat('%',#{comment.content},'%'))
+                </if>
+                <if test="comment.time != null">
+                    and com.comment_time = #{comment.time}
+                </if>
+                <if test="comment.isCheck != null">
+                    and com.comment_is_check = #{comment.isCheck}
+                </if>
+            </if>
+        </where>
+        ORDER BY com.comment_time DESC
+        <if test="page!=null and page.startIndex !=null and page.pageSize!=null">
+            limit #{page.startIndex},#{page.pageSize}
+        </if>
+    </select>
+
+    <!-- 评论排行榜-->
+    <select id="queryComRankBypage" parameterType="PageBean" resultMap="com.ecjtu.onlinemusic.dao.MusicDao.musicMap" >
+        SELECT *
+        FROM
+
+              (SELECT music_id, COUNT(music_id) as coun
+              FROM `comment`
+              where
+                consumer_id is not null
+                and music_id is not null
+                and comment_is_check=1
+              GROUP BY music_id
+              ORDER BY coun DESC) tt,
+
+              music m
+        WHERE tt.music_id = m.music_id
+        <if test="startIndex !=null and pageSize!=null">
+            limit #{startIndex},#{pageSize}
+        </if>
+    </select>
+
+</mapper>

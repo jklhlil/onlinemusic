@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecjtu.onlinemusic.dao.ConsumerDao">
+    <!--    结构映射-->
+    <resultMap id="consumerMap" type="Consumer">
+        <id property="id" column="consumer_id"></id>
+        <result property="name" column="consumer_name"></result>
+        <result property="mail" column="consumer_mail"></result>
+        <result property="phone" column="phone"></result>
+        <result property="password" column="consumer_password"></result>
+        <result property="score" column="consumer_score"></result>
+        <result property="pictureUrl" column="picture_url"></result>
+    </resultMap>
+
+    <delete id="deleteById" parameterType="Integer">
+        delete
+        from consumer
+        where consumer_id = #{aaa}
+    </delete>
+    <!--    自动设置主键useGeneratedKeys="true" keyProperty="id"。   数据库主键一定要设置自增！！！  -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into consumer(consumer_id, consumer_name, consumer_mail, phone, consumer_password, consumer_score,
+                             picture_url)
+        values (null, #{name}, #{mail}, #{phone}, #{password}, #{score}, #{pictureUrl})
+    </insert>
+    <update id="update" parameterType="Consumer">
+        update consumer
+        <set>
+            <if test="name != null and name != ''">
+                consumer_name = #{name},
+            </if>
+            <if test="mail != null and mail != ''">
+                consumer_mail = #{mail},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+            <if test="password != null and password != ''">
+                consumer_password = #{password},
+            </if>
+            <if test="score != null ">
+                consumer_score = #{score},
+            </if>
+            <if test="pictureUrl != null and pictureUrl != ''">
+                picture_url = #{pictureUrl},
+            </if>
+        </set>
+        where consumer_id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectByPage" parameterType="Consumer" resultMap="consumerMap">
+        select *
+        from consumer
+        <where>
+            <if test="consumer != null">
+                <if test="consumer.id != null ">
+                    and consumer_id = #{consumer.id}
+                </if>
+                <if test="consumer.name != null and consumer.name != ''">
+                    and consumer_name like concat(concat('%',#{consumer.name},'%'))
+                </if>
+                <if test="consumer.mail != null and consumer.mail != ''">
+                    and consumer_mail = #{consumer.mail}
+                </if>
+                <if test="consumer.phone != null and consumer.phone != ''">
+                    and phone = #{consumer.phone}
+                </if>
+                <if test="consumer.password != null and consumer.password != ''">
+                    and consumer_password = #{consumer.password}
+                </if>
+                <if test="consumer.score != null ">
+                    and consumer_score = #{consumer.score}
+                </if>
+                <if test="consumer.pictureUrl != null and consumer.pictureUrl != ''">
+                    and picture_url = #{consumer.pictureUrl},
+                </if>
+            </if>
+        </where>
+        <if test="page!=null and page.startIndex !=null and page.pageSize!=null">
+            limit #{page.startIndex},#{page.pageSize}
+        </if>
+    </select>
+
+    <select id="selectById" parameterType="Integer" resultMap="consumerMap">
+        select *
+        from consumer
+        where consumer_id = #{id}
+    </select>
+
+</mapper>

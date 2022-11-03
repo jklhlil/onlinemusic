@@ -1,0 +1,20 @@
+1. control层用 HttpServletRequest 获得请求对象
+2.获取请求体：    BufferedReader br = request.getReader();
+                String inputLine;
+                String str = "";
+                try {
+                    while ((inputLine = br.readLine()) != null) {
+                        str += inputLine;
+                    }
+                    br.close();
+                } catch (IOException e) {
+                    System.out.println("IOException: " + e);
+                }
+                System.out.println("str:" + str);
+
+接收参数：
+    两种情况
+    1.请求数据是键值对：   http://~/~?Id=17&&name=asf  与  form-data  与  x-www-form-urlencoded
+        这种情况可以直接接收数据，也可以注解@RequestParam("aaa")【可以用多个】接收。
+    2.请求数据是json:
+         使用注解@RequestBody() 【只能用一个】。

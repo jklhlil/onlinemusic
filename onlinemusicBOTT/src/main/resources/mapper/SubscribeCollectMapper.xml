@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecjtu.onlinemusic.dao.SubscribeCollectDao">
+    <!--    结构映射-->
+    <resultMap id="subscribeCollectMap" type="SubscribeCollect">
+        <id property="id" column="subscribe_collect_id"></id>
+        <result property="musicId" column="music_id"></result>
+        <result property="consumerId" column="consumer_id"></result>
+        <result property="isCollect" column="is_collect"></result>
+        <result property="isSubscribe" column="is_subscribe"></result>
+        <result property="modifyTime" column="modify_time"></result>
+
+        <!--    映射 用户和音乐    -->
+        <association property="consumer" javaType="Consumer"
+                     resultMap="com.ecjtu.onlinemusic.dao.ConsumerDao.consumerMap"></association>
+        <association property="music" javaType="Music"
+                     resultMap="com.ecjtu.onlinemusic.dao.MusicDao.musicMap"></association>
+    </resultMap>
+
+    <delete id="deleteById" parameterType="Integer">
+        delete
+        from subscribe_collect
+        where subscribe_collect_id = #{aaa}
+    </delete>
+    <!--    自动设置主键useGeneratedKeys="true" keyProperty="id"。   数据库主键一定要设置自增！！！  -->
+    <!--    now() -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into subscribe_collect(subscribe_collect_id, music_id,
+                                      consumer_id, is_collect, is_subscribe, modify_time)
+        values (null, #{musicId}, #{consumerId}, #{isCollect}, #{isSubscribe}, now())
+    </insert>
+    <!-- 数字和时间都不能跟字符串比较！！   -->
+    <!--    now() -->
+    <update id="update" parameterType="SubscribeCollect">
+        update subscribe_collect
+        <set>
+            <if test="musicId != null ">
+                music_id = #{musicId},
+            </if>
+            <if test="consumerId != null ">
+                consumer_id = #{consumerId},
+            </if>
+            <if test="isCollect != null">
+                is_collect = #{isCollect},
+            </if>
+            <if test="isSubscribe != null ">
+                is_subscribe = #{isSubscribe},
+            </if>
+            <if test="true">
+                modify_time = now(),
+            </if>
+        </set>
+        where subscribe_collect_id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectByPage" parameterType="SubscribeCollect" resultMap="subscribeCollectMap">
+        select *
+        from subscribe_collect s
+        <where>
+            s.consumer_id is not null
+            and s.music_id is not null
+            <if test="subscribeCollect != null">
+                <if test="subscribeCollect.id != null">
+                    and s.subscribe_collect_id = #{subscribeCollect.id}
+                </if>
+                <if test="subscribeCollect.musicId != null ">
+                    and s.music_id = #{subscribeCollect.musicId}
+                </if>
+                <if test="subscribeCollect.consumerId != null ">
+                    and s.consumer_id = #{subscribeCollect.consumerId}
+                </if>
+                <if test="subscribeCollect.isCollect != null ">
+                    and s.is_collect = #{subscribeCollect.isCollect}
+                </if>
+                <if test="subscribeCollect.isSubscribe != null">
+                    and s.is_subscribe = #{subscribeCollect.isSubscribe}
+                </if>
+            </if>
+        </where>
+        <if test="page!=null and page.startIndex !=null and page.pageSize!=null">
+            limit #{page.startIndex},#{page.pageSize}
+        </if>
+    </select>
+
+
+    <!-- 两表查询,能查到音乐  -->
+    <select id="selectMusicByPage" parameterType="SubscribeCollect" resultMap="subscribeCollectMap">
+        select *
+        from subscribe_collect s,music m
+        <where>
+            m.music_id=s.music_id
+            and s.consumer_id is not null
+            and s.music_id is not null
+            <if test="subscribeCollect != null">
+                <if test="subscribeCollect.id != null">
+                    and s.subscribe_collect_id = #{subscribeCollect.id}
+                </if>
+                <if test="subscribeCollect.musicId != null">
+                    and s.music_id = #{subscribeCollect.musicId}
+                </if>
+                <if test="subscribeCollect.consumerId != null ">
+                    and s.consumer_id = #{subscribeCollect.consumerId}
+                </if>
+                <if test="subscribeCollect.isCollect != null">
+                    and s.is_collect = #{subscribeCollect.isCollect}
+                </if>
+                <if test="subscribeCollect.isSubscribe != null ">
+                    and s.is_subscribe = #{subscribeCollect.isSubscribe}
+                </if>
+            </if>
+        </where>
+        ORDER BY s.modify_time DESC
+        <if test="page!=null and page.startIndex !=null and page.pageSize!=null">
+            limit #{page.startIndex},#{page.pageSize}
+        </if>
+    </select>
+
+    <!-- 两表查询,能查到用户  -->
+    <select id="selectConsumerByPage" parameterType="SubscribeCollect" resultMap="subscribeCollectMap">
+        select *
+        from subscribe_collect s,consumer c
+        <where>
+            s.consumer_id=c.consumer_id
+            and s.consumer_id is not null
+            and s.music_id is not null
+            <if test="subscribeCollect != null">
+                <if test="subscribeCollect.id != null">
+                    and s.subscribe_collect_id = #{subscribeCollect.id}
+                </if>
+                <if test="subscribeCollect.musicId != null">
+                    and s.music_id = #{subscribeCollect.musicId}
+                </if>
+                <if test="subscribeCollect.consumerId != null ">
+                    and s.consumer_id = #{subscribeCollect.consumerId}
+                </if>
+                <if test="subscribeCollect.isCollect != null">
+                    and s.is_collect = #{subscribeCollect.isCollect}
+                </if>
+                <if test="subscribeCollect.isSubscribe != null ">
+                    and s.is_subscribe = #{subscribeCollect.isSubscribe}
+                </if>
+            </if>
+        </where>
+        <if test="page!=null and page.startIndex !=null and page.pageSize!=null">
+            limit #{page.startIndex},#{page.pageSize}
+        </if>
+    </select>
+
+    <!-- 收藏排行榜-->
+    <select id="queryColRankBypage" parameterType="PageBean" resultMap="com.ecjtu.onlinemusic.dao.MusicDao.musicMap">
+        SELECT *
+        FROM
+
+        (SELECT col.music_id,COUNT(col.music_id) as coun
+        FROM
+
+        (SELECT *
+        FROM subscribe_collect
+        WHERE is_collect = 1) col
+
+        GROUP BY col.music_id
+        ORDER BY coun DESC) tt,
+
+        music m
+        WHERE tt.music_id = m.music_id
+        <if test="startIndex !=null and pageSize!=null">
+            limit #{startIndex},#{pageSize}
+        </if>
+    </select>
+
+    <!-- 订阅排行榜-->
+    <select id="querySubRankBypage" parameterType="PageBean" resultMap="com.ecjtu.onlinemusic.dao.MusicDao.musicMap">
+        SELECT *
+        FROM
+
+        (SELECT sub.music_id, COUNT(sub.music_id) as coun
+        FROM
+
+        (SELECT *
+        FROM subscribe_collect
+        WHERE is_subscribe = 1) sub
+
+        GROUP BY sub.music_id
+        ORDER BY coun DESC
+        ) tt,
+
+        music m
+        WHERE tt.music_id = m.music_id
+        <if test="startIndex !=null and pageSize!=null">
+            limit #{startIndex},#{pageSize}
+        </if>
+    </select>
+
+</mapper>

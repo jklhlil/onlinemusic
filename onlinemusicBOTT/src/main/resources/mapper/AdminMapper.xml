@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ecjtu.onlinemusic.dao.AdminDao">
+    <resultMap id="adminMap" type="Admin">
+        <id property="id" column="admin_id"></id>
+        <result property="mail" column="admin_mail"></result>
+        <result property="name" column="admin_name"></result>
+        <result property="password" column="admin_password"></result>
+    </resultMap>
+
+    <!--根据管理员id删除管理员-->
+    <delete id="deleteById" parameterType="Integer">
+        delete
+        from admin
+        where admin_id = #{id}
+    </delete>
+    <!--    自动设置主键useGeneratedKeys="true" keyProperty="id"。   数据库主键一定要设置自增！！！  -->
+    <insert id="insert"   useGeneratedKeys="true"  keyProperty="id">
+        insert into admin(admin_id,admin_mail,admin_name,admin_password)
+        values (null , #{mail}, #{name}, #{password})
+    </insert>
+    <update id="update" parameterType="Admin">
+        update admin
+        <set>
+            <if test="mail != null and mail != ''">
+                admin_mail=#{mail},
+            </if>
+            <if test="name != null and name != ''">
+                admin_name = #{name},
+            </if>
+            <if test="password != null and password != ''">
+                admin_password = #{password},
+            </if>
+
+        </set>
+        where admin_id = #{id}
+    </update>
+    <select id="selectByPage" parameterType="Admin" resultMap="adminMap">
+        select *
+        from admin
+        <where>
+            <if test="admin != null">
+                <if test="admin.id != null">
+                    and admin_id = #{admin.id}
+                </if>
+                <if test="admin.mail != null and admin.mail != ''">
+                    and admin_mail = #{admin.mail}
+                </if>
+                <if test="admin.name != null and admin.name != ''">
+                    and admin_name like concat(concat('%',#{admin.name},'%'))
+                </if>
+                <if test="admin.password != null and admin.password != ''">
+                    and admin_password = #{admin.password}
+                </if>
+            </if>
+        </where>
+        <if test="page!=null and page.startIndex !=null and page.pageSize!=null">
+            limit #{page.startIndex},#{page.pageSize}
+        </if>
+    </select>
+</mapper>
