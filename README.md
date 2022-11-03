@@ -1,8 +1,9 @@
 # onlinemusic
 
 #### 这是一个使用 vue + vue-router + axios + balbel + Element + Vant 做的移动端音频播放软件。
+#### 后端技术：spring boot，mybatis，mysql，Swagger。
 
-> 本系统主要内容包括：
+> 系统主要内容包括：
 > 1.	查询功能，方便用户快速查询某个音频资源。
 > 2.	音频收听功能，用户能流畅的播放想听的音频资源。
 > 3.	订阅功能，对于某些特定的音频资源，用户需要订阅才能试听。
